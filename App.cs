@@ -1,9 +1,9 @@
 using System;
 using Avalonia;
-using Avalonia.Markup.Xaml.Styling;
-using Avalonia.Themes.Fluent;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Platform.Storage;
+using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 
 namespace AudioSFV;
