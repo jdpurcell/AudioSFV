@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" aria-label="AudioSFV Windows icon">
+  <rect x="64" y="64" width="896" height="896" rx="120" fill="#FF6A00"></rect>
+  <path d="M96 512 C224 256, 384 256, 512 512 S800 768, 928 512" fill="none" stroke="#000" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M96 512 C224 256, 384 256, 512 512 S800 768, 928 512" fill="none" stroke="#FFF" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M341 512 L469 640 L725 384" fill="none" stroke="#000" stroke-width="80" stroke-linecap="round" stroke-linejoin="round"></path>
+  <path d="M341 512 L469 640 L725 384" fill="none" stroke="#00FF00" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
