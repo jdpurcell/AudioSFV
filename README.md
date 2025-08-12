@@ -16,9 +16,9 @@ AudioSFV introduces a file format, “.sfva” (Simple File Verification for Aud
 
 ## The .sfva file format
 Inspired by .sfv, each line contains:
-- Filename, a single space, then 8 hex digits (CRC32)
-- Comments start with ';' on a line by themselves
+- Filename, one or more spaces, then 8 hex digits (CRC32)
 - The filename may contain spaces; the CRC is the last space-separated token
+- Comments start with ';' on a line by themselves
 
 Example:
 ```
