@@ -127,6 +127,7 @@ public class MainWindow : Window {
 			(SfvaEntry entry, ResultItem item) = job;
 			string filePath = Path.Combine(baseDir, entry.FileName);
 			AudioHandler.Result? result;
+			string? errorHint = null;
 
 			Dispatcher.UIThread.Post(() => {
 				item.Status = VerificationStatus.Processing;
@@ -135,7 +136,10 @@ public class MainWindow : Window {
 			try {
 				result = AudioHandler.Process(filePath);
 			}
-			catch {
+			catch (Exception ex) {
+				errorHint =
+					ex is FileNotFoundException ? "(not found)" :
+					null;
 				result = null;
 			}
 
@@ -147,7 +151,8 @@ public class MainWindow : Window {
 					item.OutroSilenceSamples = result.OutroSilenceSamples;
 				}
 				else {
-					item.Crc = "(error)";
+					item.Crc = errorHint ?? "(error)";
+					item.Status = VerificationStatus.None;
 				}
 			});
 		}

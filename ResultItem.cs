@@ -6,7 +6,7 @@ namespace AudioSFV;
 public class ResultItem : INotifyPropertyChanged {
 	private string _fileName = "";
 	private string _crc = "";
-	private VerificationStatus _status = VerificationStatus.Pending;
+	private VerificationStatus _status;
 	private long? _introSilenceSamples;
 	private long? _outroSilenceSamples;
 
@@ -41,7 +41,7 @@ public class ResultItem : INotifyPropertyChanged {
 }
 
 public enum VerificationStatus {
-	Pending,
+	None,
 	Processing,
 	Passed,
 	Failed
