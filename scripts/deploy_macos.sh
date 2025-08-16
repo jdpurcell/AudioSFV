@@ -9,8 +9,9 @@ PROJECT_FILE=${PROJECT_FILE:-"AudioSFV.csproj"}
 APP_NAME=${APP_NAME:-"AudioSFV"}
 BUNDLE_ID=${BUNDLE_ID:-"com.jdp.${APP_NAME}"}
 APP_VERSION=${APP_VERSION:-"1.0.0"}
-ICON_PATH=${ICON_PATH:-"macos/AppIcon.icns"}
-ENTITLEMENTS_PATH=${ENTITLEMENTS_PATH:-"macos/entitlements.plist"}
+ICON_PATH=${ICON_PATH:-"assets/macos/AppIcon.icns"}
+PLIST_TEMPLATE_PATH=${PLIST_TEMPLATE_PATH:-"assets/macos/Info.plist"}
+ENTITLEMENTS_PATH=${ENTITLEMENTS_PATH:-"assets/macos/Entitlements.plist"}
 OUTPUT_DIR=${OUTPUT_DIR:-"dist"}
 SIGN_AND_NOTARIZE="${SIGN_AND_NOTARIZE:-}"
 CODESIGN_CERT_NAME="${CODESIGN_CERT_NAME:-}"
@@ -61,7 +62,6 @@ mkdir -p "$APP_DIR/Contents/MacOS" "$APP_DIR/Contents/Resources"
 cp -a "$PUBLISH_DIR"/. "$APP_DIR/Contents/MacOS/"
 
 # Create Info.plist from template with variables
-PLIST_TEMPLATE="macos/Info.plist"
 PLIST_OUT="$APP_DIR/Contents/Info.plist"
 sed -e "s/__APP_NAME__/${APP_NAME}/g" \
     -e "s/__BUNDLE_ID__/${BUNDLE_ID}/g" \
@@ -69,7 +69,7 @@ sed -e "s/__APP_NAME__/${APP_NAME}/g" \
     -e "s/__FILE_EXT__/${FILE_EXT}/g" \
     -e "s/__DOC_NAME__/${DOC_NAME}/g" \
     -e "s/__DOC_UTI__/${DOC_UTI}/g" \
-    "$PLIST_TEMPLATE" > "$PLIST_OUT"
+    "$PLIST_TEMPLATE_PATH" > "$PLIST_OUT"
 
 # Copy icon 
 cp "$ICON_PATH" "$APP_DIR/Contents/Resources/AppIcon.icns"
