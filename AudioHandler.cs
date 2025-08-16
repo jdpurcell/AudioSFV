@@ -28,7 +28,10 @@ public static class AudioHandler {
 		}
 
 		int blockAlign;
-		if (extension.Equals(".flac", StringComparison.OrdinalIgnoreCase)) {
+		if (extension.Equals(".wav", StringComparison.OrdinalIgnoreCase)) {
+			blockAlign = ProcessWav(path, ProcessData);
+		}
+		else if (extension.Equals(".flac", StringComparison.OrdinalIgnoreCase)) {
 			blockAlign = ProcessFlac(path, ProcessData);
 		}
 		else {
@@ -42,6 +45,15 @@ public static class AudioHandler {
 			IntroSilenceSamples = (firstPopulatedByte != -1 ? firstPopulatedByte : bytesProcessed) / blockAlign,
 			OutroSilenceSamples = (bytesProcessed - lastPopulatedByte - 1) / blockAlign
 		};
+	}
+
+	private static int ProcessWav(string path, AudioCallback processData) {
+		using WavReader reader = new(path);
+		int targetSamplesPerRead = 65536 / reader.BlockAlign;
+		while (reader.RunningSampleCount < reader.FileSampleCount) {
+			processData(reader.ReadSamples(targetSamplesPerRead));
+		}
+		return reader.BlockAlign;
 	}
 
 	private static int ProcessFlac(string path, AudioCallback processData) {
