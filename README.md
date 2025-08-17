@@ -8,7 +8,7 @@ AudioSFV introduces a file format, “.sfva” (Simple File Verification for Aud
 - Detects number of intro/outro silence samples (useful for gauging whether CD offset correction lost samples for drives that can't overread)
 
 ## Limitations
-- Only supported audio format is FLAC
+- Only supported audio formats are WAV and FLAC
 - Only reads/verifies but does not create .sfva files
 
 ## Screenshot
