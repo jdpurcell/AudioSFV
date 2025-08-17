@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # Deploy an Avalonia .NET app as a macOS .app bundle.
 # References: https://docs.avaloniaui.net/docs/deployment/macOS
 
@@ -17,6 +18,7 @@ SIGN_AND_NOTARIZE="${SIGN_AND_NOTARIZE:-}"
 CODESIGN_CERT_NAME="${CODESIGN_CERT_NAME:-}"
 APPLE_ID_USER="${APPLE_ID_USER:-}"
 APPLE_ID_PASS="${APPLE_ID_PASS:-}"
+REMOVE_APP="${REMOVE_APP:-}"
 
 # File association defaults
 FILE_EXT=${FILE_EXT:-"sfva"}
@@ -94,7 +96,10 @@ if [[ "$SIGN_AND_NOTARIZE" == "true" ]]; then
     xcrun notarytool submit "$DMG_FILE" --apple-id "$APPLE_ID_USER" --password "$APPLE_ID_PASS" --team-id "${CODESIGN_CERT_NAME: -11:10}" --wait
     xcrun stapler staple "$DMG_FILE"
     xcrun stapler validate "$DMG_FILE"
-    rm -r "$APP_DIR"
+fi
+
+if [[ "${REMOVE_APP}" == "true" ]]; then
+  rm -r "$APP_DIR"
 fi
 
 exit 0

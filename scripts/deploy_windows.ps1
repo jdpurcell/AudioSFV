@@ -4,7 +4,8 @@ param(
   [string]$Configuration = "Release",
   [string]$Framework = "net8.0",
   [string]$Rid,
-  [string]$OutputDir = "dist"
+  [string]$OutputDir = "dist",
+  [switch]$NoZip
 )
 
 $ErrorActionPreference = 'Stop'
@@ -34,10 +35,18 @@ if (-not (Test-Path $publishDir)) {
 
 # Prepare output
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
-$zipPath = Join-Path $OutputDir "$AppName-$Rid.zip"
-if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 
-Write-Host "Creating archive $zipPath..."
-Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
-
-Write-Host "Done: $zipPath"
+if (-not $NoZip) {
+  $zipPath = Join-Path $OutputDir "$AppName.zip"
+  if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+  Write-Host "Creating archive $zipPath..."
+  Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
+  Write-Host "Done: $zipPath"
+}
+else {
+  if (Test-Path $OutputDir) { Remove-Item $OutputDir -Recurse -Force }
+  New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
+  Write-Host "Copying publish output to $OutputDir..."
+  Copy-Item -Path (Join-Path $publishDir '*') -Destination $OutputDir -Recurse -Force
+  Write-Host "Done: $OutputDir"
+}

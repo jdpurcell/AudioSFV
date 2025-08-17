@@ -1,0 +1,48 @@
+name: Release
+on: workflow_dispatch
+jobs:
+  run:
+    name: Release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: 'windows-latest'
+          - runner: 'macos-latest'
+    runs-on: ${{ matrix.runner }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Install developer certificate
+      if: runner.os == 'macOS'
+      env:
+        APPLE_DEVID_APP_CERT_DATA: ${{ secrets.APPLE_DEVID_APP_CERT_DATA }}
+        APPLE_DEVID_APP_CERT_PASS: ${{ secrets.APPLE_DEVID_APP_CERT_PASS }}
+      run: bash scripts/install_cert_macos.sh
+    - name: Build
+      shell: pwsh
+      env:
+        DOTNET_NOLOGO: true
+        DOTNET_CLI_TELEMETRY_OPTOUT: true
+        DOTNET_ADD_GLOBAL_TOOLS_TO_PATH: false
+        DOTNET_GENERATE_ASPNET_CERTIFICATE: false
+        DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: true
+        APPLE_ID_USER: ${{ secrets.APPLE_ID_USER }}
+        APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
+      run: |
+        if ($IsWindows) {
+          ./scripts/deploy_windows.ps1 -NoZip
+        }
+        elseif ($IsMacOS) {
+          $env:REMOVE_APP = 'true'
+          bash scripts/deploy_macos.sh
+        }
+        else {
+          throw 'Unsupported OS.'
+        }
+    - name: Upload artifact
+      if: github.ref != 'refs/heads/master'
+      uses: actions/upload-artifact@v4
+      with:
+        path: dist
+        name: AudioSFV-${{ runner.os }}
