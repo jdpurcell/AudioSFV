@@ -51,8 +51,7 @@ APP_DIR="${OUTPUT_DIR}/${APP_NAME}.app"
 
 echo "Building ${APP_NAME} for ${RID} (${CONFIG})..."
 dotnet publish "$PROJECT_FILE" -c "$CONFIG" -r "$RID" \
-  -p:SelfContained=true -p:PublishSingleFile=false -p:PublishTrimmed=false \
-  -p:DebugType=None -p:DebugSymbols=false
+  --self-contained -p:DebugSymbols=false
 
 [[ -d "$PUBLISH_DIR" ]] || fail "Publish directory not found: $PUBLISH_DIR"
 

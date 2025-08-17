@@ -25,8 +25,7 @@ if (-not $Rid) {
 
 Write-Host "Building $AppName for $Rid ($Configuration)..."
 dotnet publish $ProjectFile -c $Configuration -r $Rid `
-  -p:SelfContained=true -p:PublishSingleFile=false -p:PublishTrimmed=false `
-  -p:UseAppHost=true -p:DebugType=None -p:DebugSymbols=false
+  --self-contained -p:DebugSymbols=false
 
 $publishDir = Join-Path -Path "bin/$Configuration/$Framework/$Rid/publish" -ChildPath ''
 if (-not (Test-Path $publishDir)) {
