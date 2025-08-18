@@ -89,7 +89,7 @@ public class WavReader : IDisposable {
 
 				if (formatCode == WaveFormatExtensible) {
 					ushort extensionSize = _reader.ReadUInt16();
-					if (extensionSize != 22)
+					if (extensionSize < 22)
 						throw new InvalidDataException("Invalid format extension size.");
 
 					int validBitsPerSample = _reader.ReadUInt16();
