@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
     - name: Build
       shell: pwsh
       env:
@@ -27,7 +27,7 @@ jobs:
         APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
       run: |
         if ($IsWindows) {
-          scripts/deploy_windows.ps1 -NoZip
+          scripts/deploy_windows.ps1
         }
         elseif ($IsMacOS) {
           scripts/install_cert_macos.ps1
@@ -38,7 +38,7 @@ jobs:
         }
     - name: Upload artifact
       if: github.ref != 'refs/heads/master'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         path: dist
-        name: AudioSFV-${{ runner.os }}
+        archive: false

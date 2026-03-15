@@ -9,7 +9,7 @@ set -euo pipefail
 PROJECT_FILE=${PROJECT_FILE:-"AudioSFV.csproj"}
 APP_NAME=${APP_NAME:-"AudioSFV"}
 BUNDLE_ID=${BUNDLE_ID:-"com.jdp.${APP_NAME}"}
-APP_VERSION=${APP_VERSION:-"1.0.0"}
+APP_VERSION=${APP_VERSION:-"1.2.0"}
 ICON_PATH=${ICON_PATH:-"assets/macos/AppIcon.icns"}
 PLIST_TEMPLATE_PATH=${PLIST_TEMPLATE_PATH:-"assets/macos/Info.plist"}
 ENTITLEMENTS_PATH=${ENTITLEMENTS_PATH:-"assets/macos/Entitlements.plist"}
@@ -17,7 +17,6 @@ OUTPUT_DIR=${OUTPUT_DIR:-"dist"}
 APPLE_DEVID_APP_CERT_NAME="${APPLE_DEVID_APP_CERT_NAME:-}"
 APPLE_ID_USER="${APPLE_ID_USER:-}"
 APPLE_ID_PASS="${APPLE_ID_PASS:-}"
-REMOVE_APP="${REMOVE_APP:-}"
 
 # File association defaults
 FILE_EXT=${FILE_EXT:-"sfva"}
@@ -76,13 +75,14 @@ cp "$ICON_PATH" "$APP_DIR/Contents/Resources/AppIcon.icns"
 
 # Sign .app
 if [[ -n "$APPLE_DEVID_APP_CERT_NAME" ]]; then
-    echo "Running codesign"
+    echo "Signing app bundle"
     codesign --sign "$APPLE_DEVID_APP_CERT_NAME" --deep --force --options runtime --entitlements "$ENTITLEMENTS_PATH" --timestamp "$APP_DIR"
 fi
 
 # Create .dmg
 echo "Creating disk image"
-DMG_FILE=$OUTPUT_DIR/$APP_NAME.dmg
+ARCH_SUFFIX="${RID##*-}"
+DMG_FILE="$OUTPUT_DIR/$APP_NAME-$APP_VERSION-macOS-$ARCH_SUFFIX.dmg"
 rm -f "$DMG_FILE"
 hdiutil create -srcfolder "$APP_DIR" -volname "$APP_NAME" -format UDSB "$OUTPUT_DIR/temp.sparsebundle"
 hdiutil convert "$OUTPUT_DIR/temp.sparsebundle" -format ULFO -o "$DMG_FILE"
@@ -91,7 +91,10 @@ rm -r "$APP_DIR"
 
 # Sign/notarize .dmg
 if [[ -n "$APPLE_DEVID_APP_CERT_NAME" ]]; then
+    echo "Signing dmg file"
     codesign --sign "$APPLE_DEVID_APP_CERT_NAME" --timestamp --identifier "$BUNDLE_ID.dmg" "$DMG_FILE"
+
+    echo "Notarizing dmg file"
     xcrun notarytool submit "$DMG_FILE" --apple-id "$APPLE_ID_USER" --password "$APPLE_ID_PASS" --team-id "${APPLE_DEVID_APP_CERT_NAME: -11:10}" --wait
     xcrun stapler staple "$DMG_FILE"
     xcrun stapler validate "$DMG_FILE"

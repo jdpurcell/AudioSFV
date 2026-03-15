@@ -1,11 +1,11 @@
 param(
   [string]$ProjectFile = "AudioSFV.csproj",
   [string]$AppName = "AudioSFV",
-  [string]$Configuration = "Release",
+  [string]$AppVersion = "1.2.0",
   [string]$Framework = "net8.0",
+  [string]$Configuration = "Release",
   [string]$Rid,
-  [string]$OutputDir = "dist",
-  [switch]$NoZip
+  [string]$OutputDir = "dist"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -35,17 +35,8 @@ if (-not (Test-Path $publishDir)) {
 # Prepare output
 New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
 
-if (-not $NoZip) {
-  $zipPath = Join-Path $OutputDir "$AppName.zip"
-  if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-  Write-Host "Creating archive $zipPath..."
-  Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
-  Write-Host "Done: $zipPath"
-}
-else {
-  if (Test-Path $OutputDir) { Remove-Item $OutputDir -Recurse -Force }
-  New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
-  Write-Host "Copying publish output to $OutputDir..."
-  Copy-Item -Path (Join-Path $publishDir '*') -Destination $OutputDir -Recurse -Force
-  Write-Host "Done: $OutputDir"
-}
+$archSuffix = $Rid.Split('-')[-1]
+$zipPath = Join-Path $OutputDir "$AppName-$AppVersion-Windows-$archSuffix.zip"
+if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+Write-Host "Creating archive"
+Compress-Archive -Path (Join-Path $publishDir '*') -DestinationPath $zipPath -Force
