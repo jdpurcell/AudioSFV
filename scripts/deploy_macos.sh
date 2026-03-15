@@ -14,8 +14,7 @@ ICON_PATH=${ICON_PATH:-"assets/macos/AppIcon.icns"}
 PLIST_TEMPLATE_PATH=${PLIST_TEMPLATE_PATH:-"assets/macos/Info.plist"}
 ENTITLEMENTS_PATH=${ENTITLEMENTS_PATH:-"assets/macos/Entitlements.plist"}
 OUTPUT_DIR=${OUTPUT_DIR:-"dist"}
-SIGN_AND_NOTARIZE="${SIGN_AND_NOTARIZE:-}"
-CODESIGN_CERT_NAME="${CODESIGN_CERT_NAME:-}"
+APPLE_DEVID_APP_CERT_NAME="${APPLE_DEVID_APP_CERT_NAME:-}"
 APPLE_ID_USER="${APPLE_ID_USER:-}"
 APPLE_ID_PASS="${APPLE_ID_PASS:-}"
 REMOVE_APP="${REMOVE_APP:-}"
@@ -76,9 +75,9 @@ sed -e "s/__APP_NAME__/${APP_NAME}/g" \
 cp "$ICON_PATH" "$APP_DIR/Contents/Resources/AppIcon.icns"
 
 # Sign .app
-if [[ "$SIGN_AND_NOTARIZE" == "true" ]]; then
+if [[ -n "$APPLE_DEVID_APP_CERT_NAME" ]]; then
     echo "Running codesign"
-    codesign --sign "$CODESIGN_CERT_NAME" --deep --force --options runtime --entitlements "$ENTITLEMENTS_PATH" --timestamp "$APP_DIR"
+    codesign --sign "$APPLE_DEVID_APP_CERT_NAME" --deep --force --options runtime --entitlements "$ENTITLEMENTS_PATH" --timestamp "$APP_DIR"
 fi
 
 # Create .dmg
@@ -88,17 +87,14 @@ rm -f "$DMG_FILE"
 hdiutil create -srcfolder "$APP_DIR" -volname "$APP_NAME" -format UDSB "$OUTPUT_DIR/temp.sparsebundle"
 hdiutil convert "$OUTPUT_DIR/temp.sparsebundle" -format ULFO -o "$DMG_FILE"
 rm -r "$OUTPUT_DIR/temp.sparsebundle"
+rm -r "$APP_DIR"
 
 # Sign/notarize .dmg
-if [[ "$SIGN_AND_NOTARIZE" == "true" ]]; then
-    codesign --sign "$CODESIGN_CERT_NAME" --timestamp --identifier "$BUNDLE_ID.dmg" "$DMG_FILE"
-    xcrun notarytool submit "$DMG_FILE" --apple-id "$APPLE_ID_USER" --password "$APPLE_ID_PASS" --team-id "${CODESIGN_CERT_NAME: -11:10}" --wait
+if [[ -n "$APPLE_DEVID_APP_CERT_NAME" ]]; then
+    codesign --sign "$APPLE_DEVID_APP_CERT_NAME" --timestamp --identifier "$BUNDLE_ID.dmg" "$DMG_FILE"
+    xcrun notarytool submit "$DMG_FILE" --apple-id "$APPLE_ID_USER" --password "$APPLE_ID_PASS" --team-id "${APPLE_DEVID_APP_CERT_NAME: -11:10}" --wait
     xcrun stapler staple "$DMG_FILE"
     xcrun stapler validate "$DMG_FILE"
-fi
-
-if [[ "${REMOVE_APP}" == "true" ]]; then
-  rm -r "$APP_DIR"
 fi
 
 exit 0

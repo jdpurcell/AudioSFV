@@ -13,12 +13,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Install developer certificate
-      if: runner.os == 'macOS'
-      env:
-        APPLE_DEVID_APP_CERT_DATA: ${{ secrets.APPLE_DEVID_APP_CERT_DATA }}
-        APPLE_DEVID_APP_CERT_PASS: ${{ secrets.APPLE_DEVID_APP_CERT_PASS }}
-      run: bash scripts/install_cert_macos.sh
     - name: Build
       shell: pwsh
       env:
@@ -27,14 +21,16 @@ jobs:
         DOTNET_ADD_GLOBAL_TOOLS_TO_PATH: false
         DOTNET_GENERATE_ASPNET_CERTIFICATE: false
         DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE: true
+        APPLE_DEVID_APP_CERT_DATA: ${{ secrets.APPLE_DEVID_APP_CERT_DATA }}
+        APPLE_DEVID_APP_CERT_PASS: ${{ secrets.APPLE_DEVID_APP_CERT_PASS }}
         APPLE_ID_USER: ${{ secrets.APPLE_ID_USER }}
         APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
       run: |
         if ($IsWindows) {
-          ./scripts/deploy_windows.ps1 -NoZip
+          scripts/deploy_windows.ps1 -NoZip
         }
         elseif ($IsMacOS) {
-          $env:REMOVE_APP = 'true'
+          scripts/install_cert_macos.ps1
           bash scripts/deploy_macos.sh
         }
         else {
