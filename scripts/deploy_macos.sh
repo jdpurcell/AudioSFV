@@ -5,23 +5,28 @@
 
 set -euo pipefail
 
-# ---- Configurable defaults ----
+# Configurable defaults
 PROJECT_FILE=${PROJECT_FILE:-"AudioSFV.csproj"}
 APP_NAME=${APP_NAME:-"AudioSFV"}
-BUNDLE_ID=${BUNDLE_ID:-"com.jdp.${APP_NAME}"}
-APP_VERSION=${APP_VERSION:-"1.2.0"}
-ICON_PATH=${ICON_PATH:-"assets/macos/AppIcon.icns"}
-PLIST_TEMPLATE_PATH=${PLIST_TEMPLATE_PATH:-"assets/macos/Info.plist"}
-ENTITLEMENTS_PATH=${ENTITLEMENTS_PATH:-"assets/macos/Entitlements.plist"}
+APP_VERSION=${APP_VERSION:-"1.3.0"}
+FRAMEWORK=${FRAMEWORK:-"net10.0"}
+CONFIG=${CONFIG:-"Release"}
+RID=${RID:-""}
 OUTPUT_DIR=${OUTPUT_DIR:-"dist"}
+
+# Optional env vars
 APPLE_DEVID_APP_CERT_NAME="${APPLE_DEVID_APP_CERT_NAME:-}"
 APPLE_ID_USER="${APPLE_ID_USER:-}"
 APPLE_ID_PASS="${APPLE_ID_PASS:-}"
 
-# File association defaults
-FILE_EXT=${FILE_EXT:-"sfva"}
-DOC_NAME=${DOC_NAME:-"Audio SFV"}
-DOC_UTI=${DOC_UTI:-"com.audiosfv.sfva"}
+# Other vars
+BUNDLE_ID="com.jdp.${APP_NAME}"
+ICON_PATH="assets/macos/AppIcon.icns"
+PLIST_TEMPLATE_PATH="assets/macos/Info.plist"
+ENTITLEMENTS_PATH="assets/macos/Entitlements.plist"
+FILE_EXT="sfva"
+DOC_NAME="Audio SFV"
+DOC_UTI="com.audiosfv.sfva"
 
 # ---- Helpers ----
 fail() { echo "Error: $*" >&2; exit 1; }
@@ -31,7 +36,6 @@ ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 cd "$ROOT_DIR"
 
 # Determine RID from host arch unless provided. Accepts osx-x64/osx-arm64
-RID=${RID:-""}
 if [[ -z "${RID}" ]]; then
   ARCH=$(uname -m)
   case "$ARCH" in
@@ -40,9 +44,6 @@ if [[ -z "${RID}" ]]; then
     *) fail "Unsupported arch: $ARCH. Set RID=osx-arm64 or RID=osx-x64" ;;
   esac
 fi
-
-FRAMEWORK=${FRAMEWORK:-"net8.0"}
-CONFIG=${CONFIG:-"Release"}
 
 PUBLISH_DIR="bin/${CONFIG}/${FRAMEWORK}/${RID}/publish"
 APP_DIR="${OUTPUT_DIR}/${APP_NAME}.app"

@@ -1,8 +1,8 @@
 param(
   [string]$ProjectFile = "AudioSFV.csproj",
   [string]$AppName = "AudioSFV",
-  [string]$AppVersion = "1.2.0",
-  [string]$Framework = "net8.0",
+  [string]$AppVersion = "1.3.0",
+  [string]$Framework = "net10.0",
   [string]$Configuration = "Release",
   [string]$Rid,
   [string]$OutputDir = "dist"
